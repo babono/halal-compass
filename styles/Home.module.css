@@ -1,20 +1,151 @@
 .container {
   min-height: 100vh;
-  padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  max-width: 768px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .main {
-  padding: 5rem 0;
-  flex: 1;
+  max-width: 768px;
+  margin: 0 auto;
+  height: 100vh;
+  width: 100%;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  background: #00b08d;
+  width: 100%;
+  padding: 12px 16px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  max-width: 768px;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+.location {
+  color: #fff;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  font-size: 12px;
+  margin-top: 12px;
+  margin-bottom: 17px;
+}
+
+.locationCity:after {
+  content: ", ";
+  margin-right: 5px;
+}
+
+.searchbox {
+  position: relative;
+}
+
+.searchbox input {
+  border: none;
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 8px rgba(102, 102, 102, 0.16);
+  width: 100%;
+  bottom: -32px;
+  position: absolute;
+}
+
+.iconMap {
+  background-image: url(/images/ic-location.svg);
+  background-size: contain;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
+.iconDropdown {
+  background-image: url(/images/ic-arrow.svg);
+  background-size: contain;
+  width: 16px;
+  height: 16px;
+}
+
+.bottomSheet {
+  padding: 24px 16px;
+  background-color: #fff;
+  border-radius: 12px 12px 0px 0px;
+  position: relative;
+  top: -20px;
+}
+
+.bottomSheetTitle {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.thumbnail {
+  padding: 12px 0;
+}
+
+.thumbnailImage {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 2px 2px 8px rgba(102, 102, 102, 0.16);
+  line-height: 0;
+}
+
+.thumbnailImage img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  object-fit: cover;
+}
+
+.details {
+  padding: 18px 0;
+  border-bottom: 1px solid #d9d9d9;
+  flex: 1 1 auto;
+  margin-left: 12px;
+}
+
+.category {
+  color: #666666;
+  font-size: 10px;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.loc {
+  display: flex;
+}
+
+.distance {
+  font-weight: 700;
+  font-size: 10px;
+  color: #666666;
+}
+
+.city {
+  font-size: 10px;
+  color: #666666;
+}
+
+.city::before {
+  content: "•";
+  margin: 0 5px;
 }
 
 .footer {
