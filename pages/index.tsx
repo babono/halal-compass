@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl from "mapbox-gl";
 import styles from "../styles/Home.module.css";
 import { getDatabase } from "../lib/notion";
 import GoogleMapReact from "google-map-react";
@@ -11,7 +11,7 @@ mapboxgl.accessToken =
 
 export const databaseId = process.env.NOTION_DATABASE_ID;
 
-export default function Home({ posts }) {
+export default function Home({ posts: any }) {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const mapContainer = useRef(null);
