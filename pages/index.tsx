@@ -142,48 +142,70 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {posts.map((posts: any, index: number) => (
-            <div className={styles.item} key={index}>
-              <div className={styles.thumbnail}>
-                <div className={styles.thumbnailImage}>
-                  {posts.properties && posts.properties.Thumbnail.files[0] ? (
-                    <Image
-                      width={100}
-                      height={100}
-                      alt="thumbnail"
-                      src={posts.properties.Thumbnail.files[0].external.url}
-                    />
-                  ) : (
-                    <Image
-                      width={100}
-                      height={100}
-                      alt="thumbnail placeholder"
-                      src={placeholderThumbnail}
-                    />
-                  )}
-                </div>
-              </div>
-              <div className={styles.details}>
-                <div className={styles.category}>Poultry</div>
-                <div className={styles.name}>
-                  {posts.properties["﻿Name"].title[0].plain_text}
-                </div>
-                <div className={styles.loc}>
-                  <div className={styles.distance}>
-                    {currentCoordinate !== null
-                      ? `${Math.round(
-                          HaversineDistance(
-                            currentCoordinate[1],
-                            currentCoordinate[0],
-                            posts.properties.Latitude.number,
-                            posts.properties.Longitude.number
-                          )
-                        )} km`
-                      : "Calculating..."}
+            <>
+              <div className={styles.item} key={index}>
+                <div className={styles.thumbnail}>
+                  <div className={styles.thumbnailImage}>
+                    {posts.properties && posts.properties.Thumbnail.files[0] ? (
+                      <Image
+                        width={100}
+                        height={100}
+                        alt="thumbnail"
+                        src={posts.properties.Thumbnail.files[0].external.url}
+                      />
+                    ) : (
+                      <Image
+                        width={100}
+                        height={100}
+                        alt="thumbnail placeholder"
+                        src={placeholderThumbnail}
+                      />
+                    )}
                   </div>
-                  <div className={styles.city}>Bandung, Jawa Barat</div>
+                </div>
+                <div className={styles.details}>
+                  <div className={styles.category}>Poultry</div>
+                  <div className={styles.name}>
+                    {posts.properties["﻿Name"].title[0].plain_text}
+                  </div>
+                  <div className={styles.loc}>
+                    <div className={styles.distance}>
+                      {currentCoordinate !== null
+                        ? `${Math.round(
+                            HaversineDistance(
+                              currentCoordinate[1],
+                              currentCoordinate[0],
+                              posts.properties.Latitude.number,
+                              posts.properties.Longitude.number
+                            )
+                          )} km`
+                        : "Calculating..."}
+                    </div>
+                    <div className={styles.city}>Bandung, Jawa Barat</div>
+                  </div>
                 </div>
               </div>
-            </div>
+              {index % 10 == 0 && (
+                <>
+                  <script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466930201417951"
+                    crossOrigin="anonymous"
+                  ></script>
+                  <ins
+                    className="adsbygoogle"
+                    style="display:block"
+                    data-ad-client="ca-pub-2466930201417951"
+                    data-ad-slot="8346226515"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                  />
+                  <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                  </script>
+                </>
+              )}
+            </>
           ))}
         </div>
       </main>
