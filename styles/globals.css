@@ -28,6 +28,14 @@ a {
   pointer-events: none;
 }
 
+.mapboxgl-ctrl-bottom-right {
+  display: none !important;
+}
+
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
+}
+
 .mapboxgl-ctrl-logo {
   display: none !important;
 }
