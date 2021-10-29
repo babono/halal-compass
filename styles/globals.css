@@ -35,3 +35,7 @@ a {
 .mapbox-logo {
   display: none !important;
 }
+
+.mapboxgl-ctrl-attrib-inner {
+  display: none !important;
+}

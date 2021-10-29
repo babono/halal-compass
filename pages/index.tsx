@@ -40,22 +40,13 @@ const defaultPost = {
 
 // @ts-ignore
 export default function Home({ posts }: { posts: any } = defaultPost) {
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [currentCoordinate, setCurrentCoordinate] = useState(null);
+  const [zoom, setZoom] = useState(14);
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
-
-  const location = {
-    address: "1600 Amphitheatre Parkway, Mountain View, california.",
-    lat: 37.42216,
-    lng: -122.08427,
-  };
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -64,16 +55,33 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
           var crd = position.coords;
           console.log("Your current position is:");
           console.log(`Latitude : ${crd.latitude}`);
-          setLng(crd.latitude);
           console.log(`Longitude: ${crd.longitude}`);
-          setLat(crd.longitude);
-          console.log(`More or less ${crd.accuracy} meters.`);
+          setCurrentCoordinate([crd.longitude, crd.latitude]);
         }
       );
     } else {
       console.log("Geolocation is not supported by this browser.");
     }
   };
+
+  useEffect(() => {
+    getLocation();
+  });
+
+  useEffect(() => {
+    if (currentCoordinate !== null) {
+      if (map.current) return; // initialize map only once
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current!,
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: currentCoordinate,
+        zoom: zoom,
+      });
+      const marker = new mapboxgl.Marker()
+        .setLngLat(currentCoordinate)
+        .addTo(map.current);
+    }
+  }, [currentCoordinate]);
 
   const HaversineDistance = (
     lat1: number,
@@ -102,20 +110,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
     return d;
   };
-
-  useEffect(() => {
-    getLocation();
-  });
-
-  useEffect(() => {
-    if (map.current) return; // initialize map only once
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current!,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
-    });
-  });
 
   return (
     <div className={styles.container}>
@@ -175,15 +169,16 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                 </div>
                 <div className={styles.loc}>
                   <div className={styles.distance}>
-                    {Math.round(
-                      HaversineDistance(
-                        latitude,
-                        longitude,
-                        posts.properties.Latitude.number,
-                        posts.properties.Longitude.number
-                      )
-                    )}{" "}
-                    km
+                    {currentCoordinate !== null
+                      ? `${Math.round(
+                          HaversineDistance(
+                            currentCoordinate[1],
+                            currentCoordinate[0],
+                            posts.properties.Latitude.number,
+                            posts.properties.Longitude.number
+                          )
+                        )} km`
+                      : "Calculating..."}
                   </div>
                   <div className={styles.city}>Bandung, Jawa Barat</div>
                 </div>
