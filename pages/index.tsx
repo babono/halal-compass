@@ -42,7 +42,7 @@ const defaultPost = {
 export default function Home({ posts }: { posts: any } = defaultPost) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
-  const [currentCoordinate, setCurrentCoordinate] = useState(null);
+  const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [zoom, setZoom] = useState(14);
 
   mapboxgl.accessToken =
@@ -194,7 +194,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                   ></script>
                   <ins
                     className="adsbygoogle"
-                    style="display:block"
+                    style={{ display: "block" }}
                     data-ad-client="ca-pub-2466930201417951"
                     data-ad-slot="8346226515"
                     data-ad-format="auto"
