@@ -1,21 +1,49 @@
 import Head from "next/head";
 import Image from "next/image";
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { Map } from "mapbox-gl";
 import styles from "../styles/Home.module.css";
 import { getDatabase } from "../lib/notion";
-import GoogleMapReact from "google-map-react";
 import React, { useRef, useState, useEffect } from "react";
+import placeholderThumbnail from "../public/images/placeholder-restaurant.png";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
 
 export const databaseId = process.env.NOTION_DATABASE_ID;
 
-export default function Home({ posts: any }) {
+const defaultPost = {
+  object: "page",
+  id: "0bad7dcd-c3c4-421f-b51a-3eadd58d3655",
+  created_time: "2021-09-20T14:05:00.000Z",
+  last_edited_time: "2021-10-03T08:00:00.000Z",
+  cover: null,
+  icon: null,
+  parent: {
+    type: "database_id",
+    database_id: "05844613-55ae-4bde-b645-849072603a75",
+  },
+  archived: false,
+  properties: {
+    Longitude: {
+      number: 0,
+    },
+    Category: "wow",
+    Latitude: {
+      number: 0,
+    },
+    Thumbnail: [Object],
+    Column: [Object],
+    "﻿Name": [Object],
+  },
+  url: "https://www.notion.so/D-Crepes-Mall-Taman-Anggrek-0bad7dcdc3c4421fb51a3eadd58d3655",
+};
+
+// @ts-ignore
+export default function Home({ posts }: { posts: any } = defaultPost) {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-  const mapContainer = useRef(null);
-  const map = useRef(null);
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<Map | null>(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(9);
@@ -29,13 +57,7 @@ export default function Home({ posts: any }) {
     lng: -122.08427,
   };
 
-  const LocationPin = ({ text }) => (
-    <div className="pin">
-      <p className="pin-text">{text}</p>
-    </div>
-  );
-
-  const success = (pos) => {
+  const success = ({ pos }: { pos: GeolocationPosition }) => {
     var crd = pos.coords;
     console.log("Your current position is:");
     console.log(`Latitude : ${crd.latitude}`);
@@ -47,13 +69,28 @@ export default function Home({ posts: any }) {
 
   const getLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(success);
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          var crd = position.coords;
+          console.log("Your current position is:");
+          console.log(`Latitude : ${crd.latitude}`);
+          setLatitude(crd.latitude);
+          console.log(`Longitude: ${crd.longitude}`);
+          setLongitude(crd.longitude);
+          console.log(`More or less ${crd.accuracy} meters.`);
+        }
+      );
     } else {
       console.log("Geolocation is not supported by this browser.");
     }
   };
 
-  const HaversineDistance = (lat1, long1, lat2, long2) => {
+  const HaversineDistance = (
+    lat1: number,
+    long1: number,
+    lat2: number,
+    long2: number
+  ) => {
     var R = 6371; // Radius of the Earth in miles
     var rlat1 = lat1 * (Math.PI / 180); // Convert degrees to radians
     var rlat2 = lat2 * (Math.PI / 180); // Convert degrees to radians
@@ -83,23 +120,12 @@ export default function Home({ posts: any }) {
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
-      container: mapContainer.current,
+      container: mapContainer.current!,
       style: "mapbox://styles/mapbox/streets-v11",
       center: [lng, lat],
       zoom: zoom,
     });
   });
-
-  useEffect(() => {
-    if (!map.current) return; // wait for map to initialize
-    map.current.on("move", () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-  });
-
-  console.log(posts);
 
   return (
     <div className={styles.container}>
@@ -129,36 +155,27 @@ export default function Home({ posts: any }) {
       </div>
       <main className={styles.main}>
         <div ref={mapContainer} className="map-container" />
-        <div style={{ height: "40vh", width: "100%" }}>
-          <GoogleMapReact
-            bootstrapURLKeys={{
-              key: "AIzaSyB5MAwu4diNSiI6PlTyyk1mlcYo_b6JI34",
-            }}
-            center={{
-              lat: latitude,
-              lng: longitude,
-            }}
-            defaultZoom={17}
-          >
-            <LocationPin
-              lat={latitude}
-              lng={longitude}
-              text={"Bono was here"}
-            />
-          </GoogleMapReact>
-        </div>
+
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
-          {posts.map((posts) => (
-            <div className={styles.item} key={posts.id}>
+          {posts.map((posts: any, index: number) => (
+            <div className={styles.item} key={index}>
               <div className={styles.thumbnail}>
                 <div className={styles.thumbnailImage}>
-                  {posts.properties.Thumbnail.files[0] ? (
-                    <img
+                  {posts.properties && posts.properties.Thumbnail.files[0] ? (
+                    <Image
+                      width={100}
+                      height={100}
+                      alt="thumbnail"
                       src={posts.properties.Thumbnail.files[0].external.url}
                     />
                   ) : (
-                    <img src="/images/placeholder-restaurant.png" />
+                    <Image
+                      width={100}
+                      height={100}
+                      alt="thumbnail placeholder"
+                      src={placeholderThumbnail}
+                    />
                   )}
                 </div>
               </div>
@@ -192,7 +209,7 @@ export default function Home({ posts: any }) {
 
 export const getStaticProps = async () => {
   const database = await getDatabase(databaseId);
-
+  console.log(database);
   return {
     props: {
       posts: database,
