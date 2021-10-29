@@ -23,7 +23,7 @@ a {
 
 .leaflet-bottom,
 .leaflet-top {
-  z-index: 0 !important; // This is 1000 by default
+  z-index: 0 !important;
   position: absolute;
   pointer-events: none;
 }
