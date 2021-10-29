@@ -40,8 +40,6 @@ const defaultPost = {
 
 // @ts-ignore
 export default function Home({ posts }: { posts: any } = defaultPost) {
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
   const [lng, setLng] = useState(-70.9);
@@ -61,9 +59,9 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     var crd = pos.coords;
     console.log("Your current position is:");
     console.log(`Latitude : ${crd.latitude}`);
-    setLatitude(crd.latitude);
+    setLng(crd.latitude);
     console.log(`Longitude: ${crd.longitude}`);
-    setLongitude(crd.longitude);
+    setLat(crd.longitude);
     console.log(`More or less ${crd.accuracy} meters.`);
   };
 
@@ -155,7 +153,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       </div>
       <main className={styles.main}>
         <div ref={mapContainer} className="map-container" />
-
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {posts.map((posts: any, index: number) => (
