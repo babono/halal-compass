@@ -15,6 +15,8 @@ module.exports = {
       "admin.ciwalk.com",
       "abubasteak.odoo.com",
       "encrypted-tbn0.gstatic.com",
+      "pepperlunch.id",
+      "s3.us-west-2.amazonaws.com",
     ],
   },
 };
