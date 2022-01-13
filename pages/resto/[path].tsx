@@ -15,18 +15,17 @@ export default function Resto( { data }: { data: any } ) {
   const pathSplit = String(path).split("-").slice(0,-1);    
   const getDirectionUrl = 'https://maps.google.com/?q=' + pathSplit.join("+");
   
-  const clickShare = () => {
+  const clickShare = async() => {
     const shareData = {
       title: 'HalalKompass Link',
-      text: 'HalalKompass - ' + {data.properties["Name"].title[0].plain_text},
+      text: `HalalKompass -  ${data.properties["Name"].title[0].plain_text}`,
       url: window.location.href
     }
     
     try {
       await navigator.share(shareData)
-      resultPara.textContent = 'MDN shared successfully'
     } catch(err) {
-      resultPara.textContent = 'Error: ' + err
+      console.log(err);
     }
   }
   
