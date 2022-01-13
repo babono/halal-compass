@@ -8,11 +8,11 @@ import { getPage } from "../../lib/notion";
 
 
 
-export default function Resto( { data } ) {  
+export default function Resto( { data }: { data: any } ) {  
   console.log(data);
   const router = useRouter();
   const { path } = router.query;
-  const pathSplit = path.split("-").slice(0,-1);    
+  const pathSplit = String(path).split("-").slice(0,-1);    
   const getDirectionUrl = 'https://maps.google.com/?q=' + pathSplit.join("+");
   
   
@@ -24,13 +24,15 @@ export default function Resto( { data } ) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.header}>
-        <Link href="/" className={styles.headerContainer}>
+        <Link href="/">
+          <div className={styles.headerContainer}>
           <Image
             src="/images/logo-halalcompass.svg"
             height={32}
             width={154}
             alt="halal compass"
           />
+          </div>
         </Link>        
       </div>
       <main className={styles.main}>
@@ -72,14 +74,14 @@ export default function Resto( { data } ) {
           <div className={styles.map}>
             <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-l-circle+00B08D(106.7896713,-6.24501)/106.7896713,-6.24501,14/656x328?access_token=pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw" alt="Static map image of " />
           </div>
-          <a href={getDirectionUrl} target="_blank" className={styles.button}>Get Direction</a>
+          <a href={getDirectionUrl} target="_blank" rel="noreferrer" className={styles.button}>Get Direction</a>
         </div>
       </main>
     </div>
   );
 }
 
-export async function getServerSideProps(ctx) {
+export async function getServerSideProps(ctx: any) {
   const path = ctx.query.path;
   const splitter = path.split("-");
   const pageId = splitter[splitter.length -1];

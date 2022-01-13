@@ -112,7 +112,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     return d;
   };
   
-  const getPathUrl = (url) => {
+  const getPathUrl = (url:String) => {
     const splitUrl =  url.split('/');
     return splitUrl[splitUrl.length - 1];
     
@@ -150,7 +150,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {posts.map((posts: any, index: number) => (
             <>
-              <Link href={'/resto/' + getPathUrl(posts.url)} className={styles.itemLink}>
+              <Link href={'/resto/' + getPathUrl(posts.url)}>
+                <div className={styles.itemLink}>
               <div className={styles.item} key={index}>
                 <div className={styles.thumbnail}>
                   <div className={styles.thumbnailImage}>
@@ -193,6 +194,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                   </div>
                 </div>
               </div>
+        </div>
         </Link>
               {index % 10 == 0 && (
                 <>
