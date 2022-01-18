@@ -224,13 +224,9 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   );
 }
 
-export const getStaticProps = async () => {
+export async function getServerSideProps() {  
   const database = await getDatabase(databaseId);
-  console.log(database);
-  return {
-    props: {
-      posts: database,
-    },
-    revalidate: 60,
-  };
-};
+
+  // Pass data to the page via props
+  return { props: { posts: database } }
+}
