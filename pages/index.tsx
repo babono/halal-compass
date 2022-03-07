@@ -49,7 +49,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
-
+    
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -62,12 +62,53 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       console.log("Geolocation is not supported by this browser.");
     }
   };
+  
+  const getCityState = (lat:number,lon:number) => {
+    //const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`);
+    //const region = response.json();
+    
+    //console.log(region);
+    //return "hoy";
+    
+    //return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`)
+    //.then((response) => response.json())
+    //.then((responseData) => {
+      //return responseData;
+    //})
+    //.done();
+    
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?types=place&access_token=${mapboxgl.accessToken}`)
+    .then(
+      function(response) {
+        if (response.status !== 200) {
+          console.log('Looks like there was a problem. Status Code: ' +
+            response.status);
+          return;
+        }
+        // Examine the text in the response
+        response.json().then(function(data) {
+          //console.log(data);
+          if(data.features){
+            const placeName = data.features[0].place_name;
+            const split = placeName.split(",");
+            const district = split[0];
+            //console.log(district);
+            return district;              
+          }
+        });        
+      }
+    )
+    .catch(function(err) {
+      console.log('Fetch Error :-S', err);
+    });
+  }
 
   useEffect(() => {
-    getLocation();
+    getLocation();    
+    console.log(getCityState(-6.22159, 106.61881));
     console.log(posts);
     
-  });
+  }, []);
 
   useEffect(() => {
     if (currentCoordinate !== null) {
@@ -81,6 +122,17 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       const marker = new mapboxgl.Marker()
         .setLngLat(currentCoordinate)
         .addTo(map.current);
+      
+      // add markers to map
+      for (const post of posts) {
+        // create a HTML element for each feature
+        const el = document.createElement('div');
+        el.className = 'marker';
+        const markerCoordinate = [post.properties.Longitude.number, post.properties.Latitude.number];
+        // make a marker for each feature and add to the map
+        
+        new mapboxgl.Marker(el).setLngLat(markerCoordinate).addTo(map.current);
+      }
     }
   }, [currentCoordinate]);
 
@@ -206,7 +258,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                           )} km`
                         : "Calculating..."}
                     </div>
-                    <div className={styles.city}>Bandung, Jawa Barat</div>
+                    <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
                   </div>
                 </div>
               </div>

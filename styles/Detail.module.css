@@ -93,6 +93,7 @@
 
 .headerContainer{
   display: inline-block;
+  cursor: pointer;
 }
 
 .location {
