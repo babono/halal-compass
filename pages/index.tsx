@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from 'next/link'
 import mapboxgl, { Map } from "mapbox-gl";
 import styles from "../styles/Home.module.css";
-import { getDatabase } from "../lib/notion";
+import { getDatabase, getAllDatabase } from "../lib/notion";
 import React, { useRef, useState, useEffect } from "react";
 import placeholderThumbnail from "../public/images/placeholder-restaurant.png";
 
@@ -44,12 +44,12 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
+  const [listRestaurant, setListRestaurant] = useState<any>(posts);
   const [zoom, setZoom] = useState(14);
-  console.log(posts);
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
-    
+
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -62,21 +62,37 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       console.log("Geolocation is not supported by this browser.");
     }
   };
-  
+
+  const getCuratedListRestaurant = () => {
+    if(currentCoordinate !== null){
+      listRestaurant.forEach(function (restaurant:any) {
+        const distance = Math.round(HaversineDistance(currentCoordinate[1], currentCoordinate[0], restaurant.properties.Latitude.number, restaurant.properties.Longitude.number));
+        restaurant.distance = distance;
+      });
+      listRestaurant.sort(function(a:any, b:any) {
+        return a.distance - b.distance;
+      });
+      setListRestaurant([...listRestaurant]);
+    }
+
+  };
+
+
+
   const getCityState = (lat:number,lon:number) => {
     //const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`);
     //const region = response.json();
-    
+
     //console.log(region);
     //return "hoy";
-    
+
     //return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`)
     //.then((response) => response.json())
     //.then((responseData) => {
       //return responseData;
     //})
     //.done();
-    
+
     fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?types=place&access_token=${mapboxgl.accessToken}`)
     .then(
       function(response) {
@@ -93,9 +109,9 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
             const split = placeName.split(",");
             const district = split[0];
             //console.log(district);
-            return district;              
+            return district;
           }
-        });        
+        });
       }
     )
     .catch(function(err) {
@@ -104,14 +120,20 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   }
 
   useEffect(() => {
-    getLocation();    
-    console.log(getCityState(-6.22159, 106.61881));
+    getLocation();
     console.log(posts);
-    
+
   }, []);
 
   useEffect(() => {
+    console.log("masuk");
+    console.log(listRestaurant);
+
+  }, [listRestaurant]);
+
+  useEffect(() => {
     if (currentCoordinate !== null) {
+      getCuratedListRestaurant();
       if (map.current) return; // initialize map only once
       map.current = new mapboxgl.Map({
         container: mapContainer.current!,
@@ -122,7 +144,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       const marker = new mapboxgl.Marker()
         .setLngLat(currentCoordinate)
         .addTo(map.current);
-      
+
       // add markers to map
       for (const post of posts) {
         // create a HTML element for each feature
@@ -130,7 +152,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         el.className = 'marker';
         const markerCoordinate = [post.properties.Longitude.number, post.properties.Latitude.number];
         // make a marker for each feature and add to the map
-        
+
+        // @ts-ignore
         new mapboxgl.Marker(el).setLngLat(markerCoordinate).addTo(map.current);
       }
     }
@@ -163,11 +186,11 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
     return d;
   };
-  
+
   const getPathUrl = (url:String) => {
     const splitUrl =  url.split('/');
     return splitUrl[splitUrl.length - 1];
-    
+
   }
 
   return (
@@ -216,19 +239,19 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         <div ref={mapContainer} className="map-container" />
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
-          {posts.map((posts: any, index: number) => (
+          {listRestaurant.map((posts: any, index: number) => (
             <>
               <Link href={'/resto/' + getPathUrl(posts.url)}>
                 <div className={styles.itemLink}>
               <div className={styles.item} key={index}>
                 <div className={styles.thumbnail}>
                   <div className={styles.thumbnailImage}>
-                    {posts.properties && posts.properties.Thumbnail.files[0].file ? (
+                    {posts.properties && posts.properties.Thumbnail.files[0]?.file ? (
                       <Image
                         width={100}
                         height={100}
                         alt="thumbnail"
-                        src={posts.properties.Thumbnail.files[0].file.url}
+                        src={posts.properties.Thumbnail.files[0]?.file.url}
                       />
                     ) : (
                       <Image
@@ -292,8 +315,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   );
 }
 
-export async function getServerSideProps() {  
-  const database = await getDatabase(databaseId);
+export async function getServerSideProps() {
+  const database = await getAllDatabase(databaseId);
 
   // Pass data to the page via props
   return { props: { posts: database } }
