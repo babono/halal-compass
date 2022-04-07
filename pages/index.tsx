@@ -271,7 +271,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                   <div className={styles.loc}>
                     <div className={styles.distance}>
                       {currentCoordinate !== null
-                      
+
                         ? `${(Math.round(
                             HaversineDistance(
                               currentCoordinate[1],
