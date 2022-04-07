@@ -315,8 +315,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   );
 }
 
-export async function getServerSideProps() {
-  const database = await getDatabase(databaseId);
+export async function getStaticProps() {
+  const database = await getAllDatabase(databaseId);
 
   // Pass data to the page via props
   return { props: { posts: database } }
