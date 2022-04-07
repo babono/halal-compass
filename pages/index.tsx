@@ -271,14 +271,15 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                   <div className={styles.loc}>
                     <div className={styles.distance}>
                       {currentCoordinate !== null
-                        ? `${Math.round(
+                      
+                        ? `${(Math.round(
                             HaversineDistance(
                               currentCoordinate[1],
                               currentCoordinate[0],
                               posts.properties.Latitude.number,
                               posts.properties.Longitude.number
-                            )
-                          )} km`
+                            )*10
+                          )/10).toFixed(1)} km`
                         : "Calculating..."}
                     </div>
                     <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
