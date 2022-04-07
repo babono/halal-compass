@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from 'next/link'
 import mapboxgl, { Map } from "mapbox-gl";
 import styles from "../styles/Home.module.css";
-import { getDatabase, getAllDatabase } from "../lib/notion";
+import {getDatabase, getAllDatabase, getData} from "../lib/notion";
 import React, { useRef, useState, useEffect } from "react";
 import placeholderThumbnail from "../public/images/placeholder-restaurant.png";
 
@@ -316,7 +316,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 }
 
 export async function getServerSideProps() {
-  const database = await getAllDatabase(databaseId);
+  const database = await getDatabase(databaseId);
 
   // Pass data to the page via props
   return { props: { posts: database } }
