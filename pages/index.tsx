@@ -77,48 +77,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   };
 
-
-
-  const getCityState = (lat:number,lon:number) => {
-    //const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`);
-    //const region = response.json();
-
-    //console.log(region);
-    //return "hoy";
-
-    //return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lon}.json?types=region&access_token=${mapboxgl.accessToken}`)
-    //.then((response) => response.json())
-    //.then((responseData) => {
-      //return responseData;
-    //})
-    //.done();
-
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?types=place&access_token=${mapboxgl.accessToken}`)
-    .then(
-      function(response) {
-        if (response.status !== 200) {
-          console.log('Looks like there was a problem. Status Code: ' +
-            response.status);
-          return;
-        }
-        // Examine the text in the response
-        response.json().then(function(data) {
-          //console.log(data);
-          if(data.features){
-            const placeName = data.features[0].place_name;
-            const split = placeName.split(",");
-            const district = split[0];
-            //console.log(district);
-            return district;
-          }
-        });
-      }
-    )
-    .catch(function(err) {
-      console.log('Fetch Error :-S', err);
-    });
-  }
-
   useEffect(() => {
     getLocation();
     console.log(posts);
