@@ -69,9 +69,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   const getCuratedListRestaurant = () => {
     if(currentCoordinate !== null){
-      console.log(listRestaurant);
       let copyList = [...listRestaurant];
-      console.log(copyList);
       copyList.forEach(function (restaurant:any) {
         const distance = (Math.round(
             HaversineDistance(
@@ -81,7 +79,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                 restaurant.properties.Longitude.number
             )*10
         )/10).toFixed(1);
-        //const distance = Math.round(HaversineDistance(currentCoordinate[1], currentCoordinate[0], restaurant.properties.Latitude.number, restaurant.properties.Longitude.number));
         restaurant.distance = distance;
       });
       copyList.sort(function(a:any, b:any) {
@@ -131,7 +128,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     if(initialLoadDone){
       if(listRestaurant.length > 0){
         const newList: any[] = [];
-        for (var i = 0; i < 10; i++){
+        for (var i = 0; i < 15; i++){
           newList.push(listRestaurant[i]);
         }
         setListRender((prevState: any) => [...prevState, ...newList]);
