@@ -45,6 +45,10 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const map = useRef<Map | null>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [listRestaurant, setListRestaurant] = useState<any>(posts);
+  const [listRender, setListRender] = useState<any>([]);
+  const [pageToLoad, setPageLoad] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [zoom, setZoom] = useState(14);
 
   mapboxgl.accessToken =
@@ -73,25 +77,18 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         return a.distance - b.distance;
       });
       setListRestaurant([...listRestaurant]);
+      setInitialLoadDone(true);
     }
-
   };
 
   useEffect(() => {
     getLocation();
     console.log(posts);
-
   }, []);
 
   useEffect(() => {
-    console.log("masuk");
-    console.log(listRestaurant);
-
-  }, [listRestaurant]);
-
-  useEffect(() => {
-    if (currentCoordinate !== null) {
-      getCuratedListRestaurant();
+    console.log(listRender);
+    if(listRender.length > 0){
       if (map.current) return; // initialize map only once
       map.current = new mapboxgl.Map({
         container: mapContainer.current!,
@@ -100,20 +97,41 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         zoom: zoom,
       });
       const marker = new mapboxgl.Marker()
-        .setLngLat(currentCoordinate)
-        .addTo(map.current);
+          .setLngLat(currentCoordinate)
+          .addTo(map.current);
 
       // add markers to map
-      for (const post of posts) {
+      for (const item of listRender) {
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
-        const markerCoordinate = [post.properties.Longitude.number, post.properties.Latitude.number];
+        const markerCoordinate = [item.properties.Longitude.number, item.properties.Latitude.number];
         // make a marker for each feature and add to the map
 
         // @ts-ignore
         new mapboxgl.Marker(el).setLngLat(markerCoordinate).addTo(map.current);
       }
+    }
+  }, [listRender]);
+
+  useEffect(() => {
+    console.log("masuk");
+    console.log(listRestaurant);
+    if(initialLoadDone){
+      if(listRestaurant.length > 0){
+        const newList: any[] = [];
+        for (var i = 0; i < 10; i++){
+          newList.push(listRestaurant[i]);
+        }
+        setListRender((prevState: any) => [...prevState, ...newList]);
+      }
+    }
+  }, [initialLoadDone]);
+
+  useEffect(() => {
+    if (currentCoordinate !== null) {
+      getCuratedListRestaurant();
+
     }
   }, [currentCoordinate]);
 
@@ -197,77 +215,55 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         <div ref={mapContainer} className="map-container" />
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
-          {listRestaurant.map((posts: any, index: number) => (
-            <>
-              <Link href={'/resto/' + getPathUrl(posts.url)}>
+          {listRender.map((posts: any, index: number) => (
+              <Link href={'/resto/' + getPathUrl(posts.url)} key={index}>
                 <div className={styles.itemLink}>
-              <div className={styles.item} key={index}>
-                <div className={styles.thumbnail}>
-                  <div className={styles.thumbnailImage}>
-                    {posts.properties && posts.properties.Thumbnail.files[0]?.file ? (
-                      <Image
-                        width={100}
-                        height={100}
-                        alt="thumbnail"
-                        src={posts.properties.Thumbnail.files[0]?.file.url}
-                      />
-                    ) : (
-                      <Image
-                        width={100}
-                        height={100}
-                        alt="thumbnail placeholder"
-                        src={placeholderThumbnail}
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className={styles.details}>
-                  <div className={styles.category}>{posts.properties.Category.select.name}</div>
-                  <div className={styles.name}>
-                    {posts.properties["Name"].title[0].plain_text}
-                  </div>
-                  <div className={styles.loc}>
-                    <div className={styles.distance}>
-                      {currentCoordinate !== null
-
-                        ? `${(Math.round(
-                            HaversineDistance(
-                              currentCoordinate[1],
-                              currentCoordinate[0],
-                              posts.properties.Latitude.number,
-                              posts.properties.Longitude.number
-                            )*10
-                          )/10).toFixed(1)} km`
-                        : "Calculating..."}
+                  <div className={styles.item} key={index}>
+                    <div className={styles.thumbnail}>
+                      <div className={styles.thumbnailImage}>
+                        {posts.properties && posts.properties.Thumbnail.files[0]?.file ? (
+                          <Image
+                            width={100}
+                            height={100}
+                            alt="thumbnail"
+                            src={posts.properties.Thumbnail.files[0]?.file.url}
+                          />
+                        ) : (
+                          <Image
+                            width={100}
+                            height={100}
+                            alt="thumbnail placeholder"
+                            src={placeholderThumbnail}
+                          />
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
+                    <div className={styles.details}>
+                      <div className={styles.category}>{posts.properties.Category.select.name}</div>
+                      <div className={styles.name}>
+                        {posts.properties["Name"].title[0].plain_text}
+                      </div>
+                      <div className={styles.loc}>
+                        <div className={styles.distance}>
+                          {currentCoordinate !== null
+
+                            ? `${(Math.round(
+                                HaversineDistance(
+                                  currentCoordinate[1],
+                                  currentCoordinate[0],
+                                  posts.properties.Latitude.number,
+                                  posts.properties.Longitude.number
+                                )*10
+                              )/10).toFixed(1)} km`
+                            : "Calculating..."}
+                        </div>
+                        <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-        </div>
-        </Link>
-              {index % 10 == 0 && (
-                <>
-                  <script
-                    async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466930201417951"
-                    crossOrigin="anonymous"
-                  ></script>
-                  <ins
-                    className="adsbygoogle"
-                    style={{ display: "block" }}
-                    data-ad-client="ca-pub-2466930201417951"
-                    data-ad-slot="8346226515"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                  />
-                  <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                  </script>
-                </>
-              )}
-            </>
-          ))}
+            </div>
+            </Link>
+              ))}
         </div>
       </main>
     </div>
