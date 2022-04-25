@@ -69,14 +69,25 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   const getCuratedListRestaurant = () => {
     if(currentCoordinate !== null){
-      listRestaurant.forEach(function (restaurant:any) {
-        const distance = Math.round(HaversineDistance(currentCoordinate[1], currentCoordinate[0], restaurant.properties.Latitude.number, restaurant.properties.Longitude.number));
+      console.log(listRestaurant);
+      let copyList = [...listRestaurant];
+      console.log(copyList);
+      copyList.forEach(function (restaurant:any) {
+        const distance = (Math.round(
+            HaversineDistance(
+                currentCoordinate[1],
+                currentCoordinate[0],
+                restaurant.properties.Latitude.number,
+                restaurant.properties.Longitude.number
+            )*10
+        )/10).toFixed(1);
+        //const distance = Math.round(HaversineDistance(currentCoordinate[1], currentCoordinate[0], restaurant.properties.Latitude.number, restaurant.properties.Longitude.number));
         restaurant.distance = distance;
       });
-      listRestaurant.sort(function(a:any, b:any) {
+      copyList.sort(function(a:any, b:any) {
         return a.distance - b.distance;
       });
-      setListRestaurant([...listRestaurant]);
+      setListRestaurant([...copyList]);
       setInitialLoadDone(true);
     }
   };
@@ -244,19 +255,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                         {posts.properties["Name"].title[0].plain_text}
                       </div>
                       <div className={styles.loc}>
-                        <div className={styles.distance}>
-                          {currentCoordinate !== null
-
-                            ? `${(Math.round(
-                                HaversineDistance(
-                                  currentCoordinate[1],
-                                  currentCoordinate[0],
-                                  posts.properties.Latitude.number,
-                                  posts.properties.Longitude.number
-                                )*10
-                              )/10).toFixed(1)} km`
-                            : "Calculating..."}
-                        </div>
+                        <div className={styles.distance}>{posts.distance + ' km'}</div>
                         <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
                       </div>
                     </div>
