@@ -45,8 +45,10 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const map = useRef<Map | null>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [listRestaurant, setListRestaurant] = useState<any>(posts);
+  const [sortedRestaurants, setSortedRestaurants] = useState<any>([]);
   const [listRender, setListRender] = useState<any>([]);
-  const [pageToLoad, setPageLoad] = useState(1);
+  const [pageToLoad, setPageToLoad] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [zoom, setZoom] = useState(14);
@@ -67,6 +69,25 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     }
   };
 
+  const getNextRestaurantList = () => {
+    if(sortedRestaurants.length > 0 && isLoading){
+      console.log("cuy");
+      console.log(sortedRestaurants);
+      const newList: any[] = [];
+      for (let i = 10*(pageToLoad-1); i < 10*pageToLoad; i++){
+        newList.push(sortedRestaurants[i]);
+      }
+      setListRender((prevState: any) => [...prevState, ...newList]);
+      setPageToLoad(pageToLoad + 1);
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!isLoading) return;
+    getNextRestaurantList();
+  }, [isLoading]);
+
   const getCuratedListRestaurant = () => {
     if(currentCoordinate !== null){
       let copyList = [...listRestaurant];
@@ -84,18 +105,20 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       copyList.sort(function(a:any, b:any) {
         return a.distance - b.distance;
       });
-      setListRestaurant([...copyList]);
+      setSortedRestaurants([...copyList]);
       setInitialLoadDone(true);
     }
   };
 
   useEffect(() => {
     getLocation();
-    console.log(posts);
   }, []);
 
   useEffect(() => {
-    console.log(listRender);
+    console.log(sortedRestaurants);
+  }, [sortedRestaurants]);
+
+  useEffect(() => {
     if(listRender.length > 0){
       if (map.current) return; // initialize map only once
       map.current = new mapboxgl.Map({
@@ -123,15 +146,14 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   }, [listRender]);
 
   useEffect(() => {
-    console.log("masuk");
-    console.log(listRestaurant);
     if(initialLoadDone){
-      if(listRestaurant.length > 0){
+      if(sortedRestaurants.length > 0){
         const newList: any[] = [];
         for (var i = 0; i < 15; i++){
-          newList.push(listRestaurant[i]);
+          newList.push(sortedRestaurants[i]);
         }
         setListRender((prevState: any) => [...prevState, ...newList]);
+        setPageToLoad(2);
       }
     }
   }, [initialLoadDone]);
@@ -139,7 +161,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   useEffect(() => {
     if (currentCoordinate !== null) {
       getCuratedListRestaurant();
-
     }
   }, [currentCoordinate]);
 
@@ -174,11 +195,30 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const getPathUrl = (url:String) => {
     const splitUrl =  url.split('/');
     return splitUrl[splitUrl.length - 1];
-
   }
 
+  const handleScroll = () => {
+
+    const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight
+
+    if (bottom) {
+      console.log('at the bottom');
+      setIsLoading(true);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, {
+      passive: true
+    });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} >
       <Head>
         <title>HalalKompass - Find Halal Venue</title>
         <script
