@@ -46,9 +46,12 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [listRestaurant, setListRestaurant] = useState<any>(posts);
   const [sortedRestaurants, setSortedRestaurants] = useState<any>([]);
+  const [searchResult, setSearchResult] = useState<any>([]);
   const [listRender, setListRender] = useState<any>([]);
   const [pageToLoad, setPageToLoad] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [inputSearch, setInputSearch] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [zoom, setZoom] = useState(14);
@@ -192,6 +195,30 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     return d;
   };
 
+  const handleSearch = (e: { target: { value: any; }; }) => {
+    const input = e.target.value;
+    setInputSearch(input);
+    const data = sortedRestaurants;
+    console.log(data.length);
+    const regex = new RegExp('\\b' + input, 'i');
+    setSearchResult(data.filter((item:any) => item.properties["Name"].title[0].plain_text.toLowerCase().match(regex)));
+
+  }
+
+  useEffect(() => {
+    if(inputSearch !== ""){
+      setIsSearching(true);
+    }
+    else{
+      setIsSearching(false);
+    }
+  }, [inputSearch]);
+
+  const resetSearchbar = () => {
+    setInputSearch("");
+    setIsSearching(false);
+  }
+
   const getPathUrl = (url:String) => {
     const splitUrl =  url.split('/');
     return splitUrl[splitUrl.length - 1];
@@ -207,6 +234,13 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     }
   };
 
+  const highlightSearch = (text:String) => {
+    //const startIndex = text.indexOf(inputSearch);
+    const searchTextRegExp = new RegExp(inputSearch , "i");
+    //const inputLength = inputSearch.length;
+    return text.replace(searchTextRegExp , '<strong>$&</strong>');
+  }
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, {
       passive: true
@@ -215,6 +249,25 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const searchResultComponent =
+      searchResult.length
+          ? searchResult.map((item:any) => {
+            return (
+                <Link href={'/resto/' + getPathUrl(item.url)} key={item.id} >
+                  <div className={styles.searchResultItem}>
+                    <div className={styles.searchResultItemInfo}>
+                      <div className={styles.searchResultItemTitle} dangerouslySetInnerHTML={{
+                        __html: highlightSearch(item.properties["Name"].title[0].plain_text)
+                      }} />
+                      <div className={styles.searchResultItemLocation}>{item.properties.City.rich_text[0].plain_text}, {item.properties.Province.rich_text[0].plain_text}</div>
+                    </div>
+                    <div className={styles.searchResultItemDistance}>{item.distance + ' km'}</div>
+                  </div>
+                </Link>
+            );
+          })
+          : "";
 
 
   return (
@@ -255,8 +308,20 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
           <div className={styles.locationCountry}>Indonesia</div>
           <div className={styles.iconDropdown}></div>
         </div>
+        {isSearching && (<div className={styles.overlay}></div>)}
         <div className={styles.searchbox}>
-          <input type="text" placeholder="Search halal restaurants" />
+          <input type="text" value={inputSearch} placeholder="Search halal restaurants" onChange={handleSearch} />
+          {isSearching && (<div className={styles.searchReset} onClick={() => resetSearchbar()}>
+            <Image
+                src="/images/ic-close.svg"
+                height={24}
+                width={24}
+            />
+          </div>)}
+          {isSearching && inputSearch.length > 2? (
+                <div className={styles.searchResult}>{searchResultComponent}</div>
+          ) : null}
+
         </div>
       </div>
       <main className={styles.main}>
