@@ -219,6 +219,17 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     setIsSearching(false);
   }
 
+  useEffect(() => {
+    if(isSearching){
+      document.body.style.overflow = 'hidden';
+    }
+    else{
+      document.body.style.overflow = 'unset';
+    }
+  }, [isSearching]);
+
+
+
   const getPathUrl = (url:String) => {
     const splitUrl =  url.split('/');
     return splitUrl[splitUrl.length - 1];
