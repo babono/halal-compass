@@ -96,6 +96,8 @@
   box-shadow: 2px 2px 8px rgba(102, 102, 102, 0.16);
   top: 100%;
   overflow-y: auto;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .searchResultItem{
