@@ -285,8 +285,12 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     <div className={styles.container} >
       <Head>
         <title>HalalKompass - Find Halal Venues Near You</title>
+        <meta property="og:site_name" content="HalalKompass - Find Halal Venues Near You" />
+        <meta property="og:title" content="HalalKompass - Find Halal Venues Near You" />
+        <meta property="og:description" content="Get clear validity of halal venues near you" />
         <meta name="description" content="Get clear validity of halal venues near you" />
-        <meta property="og:image" content="https://res.cloudinary.com/babono/image/upload/v1659969611/halal-kompass/og-image-square_aeon5h.jpg" />
+        <meta property="og:image:secure_url" itemProp="image" content="https://res.cloudinary.com/babono/image/upload/v1659969611/halal-kompass/og-image-square_aeon5h.jpg" />
+        <meta property="og:type" content="website" />
         <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <script
           async
