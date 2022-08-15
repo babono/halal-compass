@@ -136,6 +136,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
       // add markers to map
       for (const item of listRender) {
+        const ctaURL = '/resto/' + item.url.split("/").pop();
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
@@ -143,7 +144,12 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         // make a marker for each feature and add to the map
 
         // @ts-ignore
-        new mapboxgl.Marker(el).setLngLat(markerCoordinate).addTo(map.current);
+        new mapboxgl.Marker(el).setLngLat(markerCoordinate).setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+                .setHTML(
+                    `<div class="popupMapTitle">${item.properties.Name.title[0].plain_text}</div><a href=${ctaURL} class="popupMapCTA"></a>`
+                )
+        ).addTo(map.current);
       }
     }
   }, [listRender]);
@@ -287,8 +293,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         <title>HalalKompass - Find Halal Venues Near You</title>
         <meta property="og:site_name" content="HalalKompass - Find Halal Venues Near You" />
         <meta property="og:title" content="HalalKompass - Find Halal Venues Near You" />
-        <meta property="og:description" content="Get clear validity of halal venues near you" />
-        <meta name="description" content="Get clear validity of halal venues near you" />
+        <meta property="og:description" content="Enjoy meals worry-free at halal venues verified for you" />
+        <meta name="description" content="Enjoy meals worry-free at halal venues verified for you" />
         <meta property="og:image" content="https://res.cloudinary.com/babono/image/upload/v1659969611/halal-kompass/og-image-square_aeon5h.jpg" />
         <meta property="og:image:secure_url" itemProp="image" content="https://res.cloudinary.com/babono/image/upload/v1659969611/halal-kompass/og-image-square_aeon5h.jpg" />
         <meta property="og:type" content="website" />
