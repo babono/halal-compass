@@ -169,9 +169,13 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   }, [initialLoadDone]);
 
   const getCurrentCityCountry = () => {
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoordinate[0]},${currentCoordinate[1]}.json?types=region&access_token=${mapboxgl.accessToken}`)
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoordinate[0]},${currentCoordinate[1]}.json?types=place&access_token=${mapboxgl.accessToken}`)
         .then((response) => response.json())
-        .then((data) => setCurrentRegion(data.features[0].place_name));
+        .then((data) => {
+          const placeArray = data.features[0].place_name.split(',');
+          console.log(placeArray);
+          setCurrentRegion(`${placeArray[0].trim()}, ${placeArray[2].trim()}`);
+        });
   }
 
   useEffect(() => {
