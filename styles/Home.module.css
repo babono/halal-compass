@@ -43,10 +43,6 @@
   font-family: "DM Sans", sans-serif;
 }
 
-.locationCity:after {
-  content: ", ";
-  margin-right: 5px;
-}
 
 .overlay{
   position: fixed;

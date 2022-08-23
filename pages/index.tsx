@@ -52,6 +52,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [inputSearch, setInputSearch] = useState("");
+  const [currentRegion, setCurrentRegion] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [zoom, setZoom] = useState(14);
@@ -167,9 +168,16 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     }
   }, [initialLoadDone]);
 
+  const getCurrentCityCountry = () => {
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${currentCoordinate[0]},${currentCoordinate[1]}.json?types=region&access_token=${mapboxgl.accessToken}`)
+        .then((response) => response.json())
+        .then((data) => setCurrentRegion(data.features[0].place_name));
+  }
+
   useEffect(() => {
     if (currentCoordinate !== null) {
       getCuratedListRestaurant();
+      getCurrentCityCountry();
     }
   }, [currentCoordinate]);
 
@@ -328,8 +336,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         </div>
         <div className={styles.location}>
           <div className={styles.iconMap}></div>
-          <div className={styles.locationCity}>Jakarta</div>
-          <div className={styles.locationCountry}>Indonesia</div>
+          <div className={styles.locationCity}>{currentRegion}</div>
           <div className={styles.iconDropdown}></div>
         </div>
         {isSearching && (<div className={styles.overlay}></div>)}
