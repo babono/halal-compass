@@ -8,28 +8,29 @@ import { getPage } from "../../lib/notion";
 
 
 
-export default function Resto( { data }: { data: any } ) {  
+export default function Resto( { data }: { data: any } ) {
   console.log(data);
   const router = useRouter();
   const { path } = router.query;
-  const pathSplit = String(path).split("-").slice(0,-1);    
+  const pathSplit = String(path).split("-").slice(0,-1);
   const getDirectionUrl = 'https://maps.google.com/?q=' + pathSplit.join("+");
-  
+  const getDirectionUrlSteroid = 'https://www.google.com/maps?saddr=My+Location&daddr=' + pathSplit.join("+");
+
   const clickShare = async() => {
     const shareData = {
       title: 'HalalKompass Link',
       text: `HalalKompass -  ${data.properties["Name"].title[0].plain_text}`,
       url: window.location.href
     }
-    
+
     try {
       await navigator.share(shareData)
     } catch(err) {
       console.log(err);
     }
   }
-  
-  
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -63,7 +64,7 @@ export default function Resto( { data }: { data: any } ) {
             alt="halal compass"
           />
           </div>
-        </Link>        
+        </Link>
       </div>
       <main className={styles.main}>
         <div className={styles.content}>
@@ -85,7 +86,7 @@ export default function Resto( { data }: { data: any } ) {
                 />
               )}
             </div>
-            <div className={styles.titleCardContent}>              
+            <div className={styles.titleCardContent}>
               <div className={styles.titleCardName}>{data.properties["Name"].title[0].plain_text}</div>
               <div className={styles.titleStatus}>
                 <i className={styles.iconStatus} />
@@ -94,17 +95,16 @@ export default function Resto( { data }: { data: any } ) {
             </div>
             <div className={styles.icon} onClick={() => clickShare()}>
               <div className={styles.iconShare}></div>
-            </div>              
+            </div>
           </div>
           <div className={styles.address}>
             <div className={styles.addressLabel}>Address</div>
-            <div className={styles.addressDetail}>Jl. Suryo No. 40, Rawa Barat, Kebayoran Baru,
-              Jakarta Selatan, DKI Jakarta 12180</div>
+            <div className={styles.addressDetail}>{data.properties["Address"].rich_text[0]?.plain_text + ', ' + data.properties["City"].rich_text[0]?.plain_text + ', ' + data.properties["Province"].rich_text[0]?.plain_text}</div>
           </div>
           <div className={styles.map}>
-            <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-l-circle+00B08D(106.7896713,-6.24501)/106.7896713,-6.24501,14/656x328?access_token=pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw" alt="Static map image of " />
+            <img src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-l-circle+00B08D(${data.properties.Longitude.number},${data.properties.Latitude.number})/${data.properties.Longitude.number},${data.properties.Latitude.number},16/656x328?access_token=pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw`} alt="Static map image of " />
           </div>
-          <a href={getDirectionUrl} target="_blank" rel="noreferrer" className={styles.button}>Get Direction</a>
+          <a href={getDirectionUrlSteroid} target="_blank" rel="noreferrer" className={styles.button}>Get Direction</a>
         </div>
       </main>
     </div>
