@@ -411,9 +411,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
               ))}
         </div>
       </main>
-      <Script
-          src={'http' + (location.protocol === 'https:' ? 's' : '') + '://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js'}
-      ></Script>
+      <Script src="https://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js"/>
     </div>
   );
 }
