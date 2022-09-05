@@ -324,18 +324,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}', {
-            page_path: window.location.pathname,
-          });
-        `,
-          }}
-        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.header}>
@@ -370,7 +358,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       </div>
       <main className={styles.main}>
         <div ref={mapContainer} className="map-container" />
-        <Script src="https://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js"/>
+        <Script async data-cfasync="false" src="//pl17674697.profitablegatetocontent.com/e3ed536ebd906de79d60716226dd0299/invoke.js" />
+        <div id="container-e3ed536ebd906de79d60716226dd0299"></div>
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {listRender.map((posts: any, index: number) => (
