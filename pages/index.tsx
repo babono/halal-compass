@@ -370,6 +370,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       </div>
       <main className={styles.main}>
         <div ref={mapContainer} className="map-container" />
+        <Script src="https://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js"/>
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {listRender.map((posts: any, index: number) => (
@@ -411,7 +412,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
               ))}
         </div>
       </main>
-      <Script src="https://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js"/>
     </div>
   );
 }
