@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
-import Link from 'next/link'
+import Link from 'next/link';
+import Script from 'next/script';
 import mapboxgl, { Map } from "mapbox-gl";
 import styles from "../styles/Home.module.css";
 import {getDatabase, getAllDatabase, getData} from "../lib/notion";
@@ -279,6 +280,14 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     };
   }, []);
 
+  const atOptions = {
+    'key' : '0cc0eb3ff40fbc913410ef3eff2cdbac',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+
   const searchResultComponent =
       searchResult.length
           ? searchResult.map((item:any) => {
@@ -402,6 +411,9 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
               ))}
         </div>
       </main>
+      <Script
+          src={'http' + (location.protocol === 'https:' ? 's' : '') + '://www.highperformancedisplayformat.com/0cc0eb3ff40fbc913410ef3eff2cdbac/invoke.js'}
+      ></Script>
     </div>
   );
 }
