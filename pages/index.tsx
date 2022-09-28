@@ -3,10 +3,12 @@ import Image from "next/image";
 import Link from 'next/link';
 import Script from 'next/script';
 import mapboxgl, { Map } from "mapbox-gl";
+import posthog from 'posthog-js'
 import styles from "../styles/Home.module.css";
 import {getDatabase, getAllDatabase, getData} from "../lib/notion";
 import React, { useRef, useState, useEffect } from "react";
 import placeholderThumbnail from "../public/images/placeholder-restaurant.png";
+import posthog from "posthog-js";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
@@ -60,6 +62,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
+
+  posthog.init('phc_tZu7vUycI2ZEXO2eYHw83M0fsqIrhCbj7f1OZEbx2e5', { api_host: 'https://app.posthog.com' })
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -117,6 +121,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   useEffect(() => {
     getLocation();
+    posthog.capture('my event', { property: 'value' })
   }, []);
 
   useEffect(() => {
