@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from 'next/link';
 import Script from 'next/script';
 import mapboxgl, { Map } from "mapbox-gl";
-import posthog from 'posthog-js'
 import styles from "../styles/Home.module.css";
 import {getDatabase, getAllDatabase, getData} from "../lib/notion";
 import React, { useRef, useState, useEffect } from "react";
