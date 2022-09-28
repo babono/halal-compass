@@ -1,7 +1,7 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
-
+import { usePostHog } from 'next-use-posthog'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
@@ -9,6 +9,8 @@ import * as ga from '../lib/ga'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+
+  usePostHog('phc_tZu7vUycI2ZEXO2eYHw83M0fsqIrhCbj7f1OZEbx2e5', { api_host: 'https://app.posthog.com' })
 
     useEffect(() => {
       const handleRouteChange = (url:string) => {
