@@ -389,7 +389,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
                       </div>
                     </div>
                     <div className={styles.details}>
-                      <div className={styles.category}>{posts.properties.Category.select.name}</div>
+                      <div className={styles.category}>{posts.properties.Category.multi_select[0].name}</div>
                       <div className={styles.name}>
                         {posts.properties["Name"].title[0].plain_text}
                       </div>

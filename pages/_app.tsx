@@ -1,7 +1,7 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
-//import posthog from 'posthog-js';
+import posthog from 'posthog-js';
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
@@ -12,11 +12,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     useEffect(() => {
       // Init PostHog
-      //posthog.init('phc_tZu7vUycI2ZEXO2eYHw83M0fsqIrhCbj7f1OZEbx2e5', { api_host: 'https://app.posthog.com' });
+      posthog.init('phc_tZu7vUycI2ZEXO2eYHw83M0fsqIrhCbj7f1OZEbx2e5', { api_host: 'https://app.posthog.com' });
 
       const handleRouteChange = (url:string) => {
         ga.pageview(url)
-        //posthog.capture('$pageview');
+        posthog.capture('$pageview');
       }
       //When the component is mounted, subscribe to router changes
       //and log those page views
