@@ -14,7 +14,7 @@ export default function Resto( { data }: { data: any } ) {
   const { path } = router.query;
   const pathSplit = String(path).split("-").slice(0,-1);
   const getDirectionUrl = 'https://maps.google.com/?q=' + pathSplit.join("+");
-  const getDirectionUrlSteroid = 'https://www.google.com/maps?saddr=Your+Location&daddr=' + pathSplit.join("+");
+  const getDirectionUrlSteroid = 'https://www.google.com/maps/dir/?api=1&origin=Your+Location&destination=' + pathSplit.join("+");
 
   const clickShare = async() => {
     const shareData = {
