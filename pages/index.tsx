@@ -4,7 +4,8 @@ import Link from 'next/link';
 import Script from 'next/script';
 import mapboxgl, { Map } from "mapbox-gl";
 import styles from "../styles/Home.module.css";
-import {getDatabase, getAllDatabase, getData} from "../lib/notion";
+import { getDatabase, getAllDatabase, getData } from "../lib/notion";
+import { supabase, getRestaurants } from '../lib/supabaseClient'
 import React, { useRef, useState, useEffect } from "react";
 import placeholderThumbnail from "../public/images/placeholder-restaurant.png";
 
@@ -15,30 +16,13 @@ mapboxgl.accessToken =
 export const databaseId = process.env.NOTION_DATABASE_ID;
 
 const defaultPost = {
-  object: "page",
-  id: "0bad7dcd-c3c4-421f-b51a-3eadd58d3655",
-  created_time: "2021-09-20T14:05:00.000Z",
-  last_edited_time: "2021-10-03T08:00:00.000Z",
-  cover: null,
-  icon: null,
-  parent: {
-    type: "database_id",
-    database_id: "05844613-55ae-4bde-b645-849072603a75",
-  },
-  archived: false,
-  properties: {
-    Longitude: {
-      number: 0,
-    },
+  uuid: "0bad7dcd-c3c4-421f-b51a-3eadd58d3655",
+    Longitude: 123,
     Category: "wow",
-    Latitude: {
-      number: 0,
-    },
-    Thumbnail: [Object],
-    Column: [Object],
-    "﻿Name": [Object],
-  },
-  url: "https://www.notion.so/D-Crepes-Mall-Taman-Anggrek-0bad7dcdc3c4421fb51a3eadd58d3655",
+    Latitude: 321,
+    Thumbnail: "test",
+  Name: "halo"
+
 };
 
 // @ts-ignore
@@ -59,10 +43,10 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [zoom, setZoom] = useState(14);
 
+
+
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYmFib25vIiwiYSI6ImNrdW1zeWEwdTN0eG8yd284dmhwOWM0eGIifQ.bzL5KhWkOBuYEX0GZepfEw";
-
-
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -79,8 +63,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
   const getNextRestaurantList = () => {
     if(sortedRestaurants.length > 0 && isLoading){
-      console.log("cuy");
-      console.log(sortedRestaurants);
       const newList: any[] = [];
       for (let i = 10*(pageToLoad-1); i < 10*pageToLoad; i++){
         newList.push(sortedRestaurants[i]);
@@ -104,8 +86,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
             HaversineDistance(
                 currentCoordinate[1],
                 currentCoordinate[0],
-                restaurant.properties.Latitude.number,
-                restaurant.properties.Longitude.number
+                restaurant.Latitude,
+                restaurant.Longitude
             )*10
         )/10).toFixed(1);
         restaurant.distance = distance;
@@ -123,10 +105,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
   }, []);
 
   useEffect(() => {
-    console.log(sortedRestaurants);
-  }, [sortedRestaurants]);
-
-  useEffect(() => {
     if(listRender.length > 0){
       if (map.current) return; // initialize map only once
       map.current = new mapboxgl.Map({
@@ -141,18 +119,18 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 
       // add markers to map
       for (const item of listRender) {
-        const ctaURL = '/resto/' + item.url.split("/").pop();
+        const ctaURL = '/resto/' + item.uuid;
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
-        const markerCoordinate = [item.properties.Longitude.number, item.properties.Latitude.number];
+        const markerCoordinate = [item.Longitude, item.Latitude];
         // make a marker for each feature and add to the map
 
         // @ts-ignore
         new mapboxgl.Marker(el).setLngLat(markerCoordinate).setPopup(
             new mapboxgl.Popup({ offset: 25 }) // add popups
                 .setHTML(
-                    `<div class="popupMapTitle">${item.properties.Name.title[0].plain_text}</div><a href=${ctaURL} class="popupMapCTA"></a>`
+                    `<div class="popupMapTitle">${item.Name}</div><a href=${ctaURL} class="popupMapCTA"></a>`
                 )
         ).addTo(map.current);
       }
@@ -177,7 +155,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         .then((response) => response.json())
         .then((data) => {
           const placeArray = data.features[0].place_name.split(',');
-          console.log(placeArray);
           setCurrentRegion(`${placeArray[0].trim()}, ${placeArray[2].trim()}`);
         });
   }
@@ -221,9 +198,8 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     const input = e.target.value;
     setInputSearch(input);
     const data = sortedRestaurants;
-    console.log(data.length);
     const regex = new RegExp('\\b' + input, 'i');
-    setSearchResult(data.filter((item:any) => item.properties["Name"].title[0].plain_text.toLowerCase().match(regex)));
+    setSearchResult(data.filter((item:any) => item.Name.toLowerCase().match(regex)));
 
   }
 
@@ -262,7 +238,6 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight
 
     if (bottom) {
-      console.log('at the bottom');
       setIsLoading(true);
     }
   };
@@ -272,6 +247,12 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
     const searchTextRegExp = new RegExp(inputSearch , "i");
     //const inputLength = inputSearch.length;
     return text.replace(searchTextRegExp , '<strong>$&</strong>');
+  }
+
+  const getCategory = (text:String) => {
+    const splitCategory = text.split(',');
+
+    return splitCategory[0];
   }
 
   useEffect(() => {
@@ -295,13 +276,13 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
       searchResult.length
           ? searchResult.map((item:any) => {
             return (
-                <Link href={'/resto/' + getPathUrl(item.url)} key={item.id} >
+                <Link href={'/resto/' + getPathUrl(item.uuid)} key={item.id} >
                   <div className={styles.searchResultItem}>
                     <div className={styles.searchResultItemInfo}>
                       <div className={styles.searchResultItemTitle} dangerouslySetInnerHTML={{
-                        __html: highlightSearch(item.properties["Name"].title[0].plain_text)
+                        __html: highlightSearch(item.Name)
                       }} />
-                      <div className={styles.searchResultItemLocation}>{item.properties.City.rich_text[0].plain_text}, {item.properties.Province.rich_text[0].plain_text}</div>
+                      <div className={styles.searchResultItemLocation}>{item.City}, {item.Province}</div>
                     </div>
                     <div className={styles.searchResultItemDistance}>{item.distance + ' km'}</div>
                   </div>
@@ -366,36 +347,29 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
         <div className={styles.bottomSheet}>
           <div className={styles.bottomSheetTitle}>All Restaurant</div>
           {listRender.map((posts: any, index: number) => (
-              <Link href={'/resto/' + getPathUrl(posts.url)} key={index}>
+              <Link href={'/resto/' + posts.uuid} key={index}>
                 <div className={styles.itemLink}>
                   <div className={styles.item} key={index}>
                     <div className={styles.thumbnail}>
                       <div className={styles.thumbnailImage}>
-                        {posts.properties && posts.properties.Thumbnail.files[0]?.file ? (
-                          <Image
-                            width={100}
-                            height={100}
-                            alt="thumbnail"
-                            src={posts.properties.Thumbnail.files[0]?.file.url}
-                          />
-                        ) : (
+
                           <Image
                             width={100}
                             height={100}
                             alt="thumbnail placeholder"
                             src={placeholderThumbnail}
                           />
-                        )}
+
                       </div>
                     </div>
                     <div className={styles.details}>
-                      <div className={styles.category}>{posts.properties.Category.multi_select[0].name}</div>
+                      <div className={styles.category}>{getCategory(posts.Category)}</div>
                       <div className={styles.name}>
-                        {posts.properties["Name"].title[0].plain_text}
+                        {posts.Name}
                       </div>
                       <div className={styles.loc}>
                         <div className={styles.distance}>{posts.distance + ' km'}</div>
-                        <div className={styles.city}>{posts.properties.City.rich_text[0].plain_text}, {posts.properties.Province.rich_text[0].plain_text}</div>
+                        <div className={styles.city}>{posts.City}, {posts.Province}</div>
                       </div>
                     </div>
                   </div>
@@ -409,7 +383,7 @@ export default function Home({ posts }: { posts: any } = defaultPost) {
 }
 
 export async function getStaticProps() {
-  const database = await getAllDatabase(databaseId);
+  const database = await getRestaurants();
 
   // Pass data to the page via props
   return { props: { posts: database } }
