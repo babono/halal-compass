@@ -21,7 +21,7 @@ const defaultPost = {
     Category: "wow",
     Latitude: 321,
     Thumbnail: "test",
-  Name: "halo"
+    Name: "halo"
 
 };
 
